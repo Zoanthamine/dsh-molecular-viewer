@@ -1,0 +1,4 @@
+- insert:
+    - id: hjt-molecular-viewer
+      name: dsh-molecular-viewer
+      disabled: !!js "[...ctx.loader.entries()].some((e) => e.options.name === 'dsh-molecular-viewer' && e.options.id !== 'hjt-molecular-viewer' && !e.disabled)"

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>分子结构查看器 · DSH</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="vendor/3Dmol-min.js"></script>
+  <script defer src="parsers.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar" aria-label="分子查看器控制面板">
+      <header class="brand">
+        <div class="brand-mark" aria-hidden="true">⬡</div>
+        <div><h1>分子结构查看器</h1><p>本地坐标 · 无上传 · 无自动计算</p></div>
+      </header>
+      <section class="panel" aria-labelledby="importTitle">
+        <h2 id="importTitle"><span class="section-number">01</span> 打开结构</h2>
+        <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="选择或拖入结构文件">
+          <span class="drop-icon" aria-hidden="true">＋</span>
+          <strong>拖入文件，或点击选择</strong>
+          <small>XYZ · MOL / SDF · PDB · 计算输入 / 输出</small>
+        </div>
+        <input id="fileInput" type="file" multiple accept=".xyz,.mol,.sdf,.pdb,.ent,.log,.out,.output,.gjf,.com,.inp,.fchk,.fch" hidden>
+        <div class="button-row">
+          <button type="button" id="pasteToggle" class="secondary" aria-expanded="false" aria-controls="pastePanel">粘贴 XYZ</button>
+          <button type="button" id="demoButton" class="secondary">水分子示例</button>
+        </div>
+        <div id="pastePanel" class="paste-panel" hidden>
+          <label for="pasteName">名称</label><input id="pasteName" type="text" value="粘贴结构.xyz" maxlength="260">
+          <label for="pasteInput">完整 XYZ（原子数、注释行、坐标）</label>
+          <textarea id="pasteInput" rows="7" spellcheck="false" placeholder="3&#10;water&#10;O  0.000 0.000 0.000&#10;H  0.758 0.000 0.504&#10;H -0.758 0.000 0.504"></textarea>
+          <button type="button" id="loadPaste" class="primary full-width">载入坐标</button>
+        </div>
+        <div class="list-heading"><span>已打开 <b id="fileCount">0</b></span><button type="button" id="clearFiles" class="text-button">清空文件</button></div>
+        <ul id="fileList" class="file-list" aria-label="已打开的结构文件"></ul>
+        <p id="noFiles" class="muted compact">尚未打开文件；示例不会自动载入。</p>
+      </section>
+      <section class="panel" aria-labelledby="frameTitle">
+        <h2 id="frameTitle"><span class="section-number">02</span> 结构 / 构象帧</h2>
+        <label for="frameSelect" class="sr-only">当前构象</label>
+        <select id="frameSelect" disabled><option>暂无结构</option></select>
+        <div class="frame-navigation"><button type="button" id="framePrev" class="secondary" disabled>← 上一帧</button><span id="frameCounter">— / —</span><button type="button" id="frameNext" class="secondary" disabled>下一帧 →</button></div>
+        <div class="button-row"><button type="button" id="frameLast" class="secondary" disabled>最后帧</button><button type="button" id="frameConverged" class="secondary" disabled title="选择最后一个带明确优化收敛标记的坐标块；不是极小值或过渡态验证">收敛标记帧</button><button type="button" id="exportXyz" class="secondary" disabled>本帧 XYZ</button></div>
+        <div class="button-row"><button type="button" id="trajectoryPlay" class="secondary" disabled title="顺序播放坐标帧，不代表分子动力学的物理时间">播放轨迹</button><label for="trajectorySpeed" class="sr-only">轨迹播放速度</label><select id="trajectorySpeed" aria-label="轨迹播放速度"><option value="1">1 帧/秒</option><option value="3" selected>3 帧/秒</option><option value="6">6 帧/秒</option></select></div>
+        <dl id="structureInfo" class="info-grid"><dt>格式</dt><dd id="formatValue">—</dd><dt>原子</dt><dd id="atomCountValue">—</dd><dt>连接</dt><dd id="bondSourceValue">—</dd><dt>来源</dt><dd id="sourceValue">—</dd></dl>
+        <ul id="importantWarnings" class="warnings" aria-label="需要注意的状态" hidden></ul>
+        <details id="sourceDetails" class="source-details">
+          <summary>坐标与来源详情</summary>
+          <dl id="extraMetadata" class="info-grid extra-metadata"></dl>
+          <ul id="warnings" class="warnings" aria-label="详细来源说明" hidden></ul>
+        </details>
+      </section>
+      <section class="panel" aria-labelledby="displayTitle">
+        <h2 id="displayTitle"><span class="section-number">03</span> 显示</h2>
+        <label for="displayStyle">表示方式</label>
+        <select id="displayStyle"><option value="ball-stick">球棍</option><option value="stick">棒状</option><option value="space-fill">空间填充</option></select>
+        <div class="option-grid">
+          <label class="check"><input id="showHydrogens" type="checkbox" checked> 显示氢</label>
+          <label class="check"><input id="showLabels" type="checkbox"> 原子编号</label>
+          <label class="check"><input id="autoRotate" type="checkbox"> 自动旋转</label>
+          <label class="check"><input id="inferBonds" type="checkbox" checked> 距离连线示意</label>
+        </div>
+        <p class="muted compact">连线仅作示意；详见来源详情。</p>
+        <div class="background-row"><label for="backgroundColor">背景</label><input id="backgroundColor" type="color" value="#f1f5f9" aria-label="分子视区背景颜色"><button type="button" id="resetView" class="secondary">复位视角</button><button type="button" id="exportPng" class="secondary">导出 PNG</button></div>
+      </section>
+      <section class="panel" aria-labelledby="measureTitle">
+        <h2 id="measureTitle"><span class="section-number">04</span> 点选测量</h2>
+        <label for="measurementMode">依次点击分子中的原子</label>
+        <select id="measurementMode"><option value="distance">距离 · 2 原子</option><option value="angle">键角 · 3 原子</option><option value="dihedral">二面角 · 4 原子</option></select>
+        <ol id="selectedAtomList" class="selected-atoms"></ol>
+        <p id="selectionHint" class="muted compact">请选择 2 个原子。切换文件 / 帧会清空测量。</p>
+        <div class="measurement-table-wrap"><table class="measurement-table"><caption class="sr-only">当前帧测量结果</caption><thead><tr><th scope="col">类型 / 原子</th><th scope="col">结果</th></tr></thead><tbody id="measurementResults"></tbody></table></div>
+        <button type="button" id="clearSelection" class="secondary full-width">清空选择与测量</button>
+      </section>
+      <footer class="sidebar-footer">仅查看，不改写坐标。</footer>
+    </aside>
+    <main class="main" id="main">
+      <header class="viewer-toolbar">
+        <button type="button" id="toggleSidebar" class="icon-button" aria-controls="sidebar" aria-expanded="true" title="折叠 / 展开侧栏">☰<span class="sr-only">折叠 / 展开侧栏</span></button>
+        <div class="viewer-title"><strong id="currentTitle">打开一个分子结构</strong><span id="currentSubtitle">拖入文件即可查看</span></div>
+        <span class="local-badge">本地查看</span>
+      </header>
+      <div class="viewport" id="viewport">
+        <div id="viewer" aria-label="交互式分子三维视区"></div>
+        <div id="emptyState" class="empty-state"><span class="empty-molecule" aria-hidden="true">⬡</span><h2>分子视区</h2><p>拖入结构文件、粘贴 XYZ，或载入水分子示例。</p><p class="muted">左键旋转 · 滚轮缩放 · 点击原子测量</p></div>
+        <div class="interaction-note" id="interactionNote">拖动旋转 · 滚轮缩放 · 点选测量</div>
+      </div>
+      <footer class="statusbar"><span id="status" role="status" aria-live="polite">等待打开结构</span><span id="renderStats">0 原子</span></footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+{
+  "name": "dsh-molecular-viewer",
+  "version": "0.2.1",
+  "description": "Local molecular 3D viewer for DSH: Gaussian/ORCA/FCHK coordinates, trajectories, measurements and agent integration.",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/",
+    "public/",
+    "docs/AGENT-INTEGRATION.md",
+    "docs/README.md",
+    "README.md",
+    "README.zh-CN.md",
+    "cordis.patch.yml",
+    "THIRD_PARTY_NOTICES.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "^0.2.2-rc.2",
+    "react": "^18.2.0",
+    "dsh-better-sidebar": ">=0.32.1 <0.33.0"
+  },
+  "dsh": {
+    "engines": {
+      "dsh": ">=0.2.2-rc.2"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "dsh-better-sidebar"
+      ]
+    },
+    "manifestVersion": 1
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.cjs tests/*.test.mjs",
+    "build:offline": "python build-offline.py",
+    "audit:release": "node scripts/audit-public.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zoanthamine/dsh-molecular-viewer.git"
+  },
+  "homepage": "https://github.com/Zoanthamine/dsh-molecular-viewer#readme",
+  "bugs": {
+    "url": "https://github.com/Zoanthamine/dsh-molecular-viewer/issues"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "chemistry",
+    "molecular-viewer",
+    "gaussian",
+    "orca"
+  ]
+}
