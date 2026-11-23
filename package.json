@@ -1,6 +1,6 @@
 {
   "name": "dsh-molecular-viewer",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Local molecular 3D viewer for DSH: Gaussian/ORCA/FCHK coordinates, trajectories, measurements and agent integration.",
   "type": "module",
   "main": "./lib/index.js",

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2 — Chem3D PDB compatibility
+
+- Preserve distinct atom serials when atom names repeat without an explicit alternate-location site, including Chem3D exports with blank residue names.
+- Keep existing consistent-residue alternate-location selection for actual alternate atom sites.
+- Add synthetic repeated-name, 60-atom, connectivity and mixed-altloc regressions; no user molecular file is included.
+
 ## 0.2.1 — public distribution
 
 - Public GitHub repository, bilingual setup documentation, agent integration guide and synthetic regression tests.

@@ -219,12 +219,15 @@
     if (current) fail('Truncated MODEL: ENDMDL missing', current.lineStart);
     if (!explicit) blocks.push({ atoms: implicit, lineStart: 1 });
     blocks.forEach(function (block, bi) {
-      var alternatives = new Map();
+      var alternatives = new Map(), alternateAtomKeys = new Set();
       function residueKey(a) { return [a.chain, a.residueId, a.insertionCode].join('|'); }
       block.atoms.forEach(function (a) {
         var key = residueKey(a);
         if (!alternatives.has(key)) alternatives.set(key, new Set());
-        if (a.altLoc) alternatives.get(key).add(a.altLoc);
+        if (a.altLoc) {
+          alternatives.get(key).add(a.altLoc);
+          alternateAtomKeys.add(key + '|' + a.atomName);
+        }
       });
       var choices = new Map(), hasAlt = false;
       alternatives.forEach(function (alts, key) { var labels = Array.from(alts).sort(); if (labels.length) { hasAlt = true; choices.set(key, alts.has('A') ? 'A' : labels[0]); } });
@@ -234,6 +237,9 @@
         var key = residueKey(a);
         if (a.altLoc && a.altLoc !== choices.get(key)) return;
         var atomKey = key + '|' + a.atomName;
+        // Repeated blank-altloc names can be distinct Chem3D atoms: serial is their identity.
+        // Name-based deduplication is valid only at a site with explicit alternate locations.
+        if (!alternateAtomKeys.has(atomKey)) atomKey = 'serial:' + a.serial;
         if (!chosen.has(atomKey)) chosen.set(atomKey, a);
         else if (!a.altLoc && chosen.get(atomKey).altLoc) chosen.set(atomKey, a);
         else warn(ctx, 'PDB duplicate atom names after altloc selection: shared blank atom or first occurrence retained.');

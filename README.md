@@ -11,7 +11,7 @@ Requirements: Node 22+, DSH 0.2.2-rc.2+, and the enabled `dsh-better-sidebar` 0.
 Use the prebuilt release; there are no install-time build scripts:
 
 ```sh
-dsh plugin add https://github.com/Zoanthamine/dsh-molecular-viewer/releases/download/v0.2.1/dsh-molecular-viewer-0.2.1.tgz
+dsh plugin add https://github.com/Zoanthamine/dsh-molecular-viewer/releases/download/v0.2.2/dsh-molecular-viewer-0.2.2.tgz
 ```
 
 Refresh the existing DSH page, open the current conversation, and select **+ → 分子三维** in the sidebar. Sign in normally if required. Alternatively, download the offline ZIP from [Releases](https://github.com/Zoanthamine/dsh-molecular-viewer/releases), extract it, and open `index.html`. Keep its companion files and `vendor/` directory together. No server or network is needed for offline viewing.
@@ -62,12 +62,12 @@ node --test tests/*.test.cjs tests/*.test.mjs
 node scripts/audit-public.mjs
 python build-offline.py
 pnpm pack --pack-destination dist
-node scripts/audit-public.mjs dist/dsh-molecular-viewer-0.2.1.tgz
+node scripts/audit-public.mjs dist/dsh-molecular-viewer-0.2.2.tgz
 ```
 
 Tests use synthetic inputs and frozen rendering-core digests, not personal calculation files or a private DSH installation. CI runs on Node 22 and 24. Vendored 3Dmol.js 2.5.3 and its BSD license are included; no downloaded build or install hook is required.
 
-Version **0.2.1** is the public-distribution cleanup of the validated 0.2.0 runtime. Executable and viewer files are unchanged; private inputs, paths, local acceptance records and research history are excluded. Market listing is a separate maintainer-reviewed submission, not guaranteed by publishing a release.
+Version **0.2.2** fixes Chem3D-style PDB files with repeated atom names and no alternate locations: distinct atom serials and their explicit CONECT connections are preserved. Actual alternate-location selection still applies only to the affected sites. Synthetic regression tests cover this behavior; private inputs, paths, local acceptance records and research history are excluded. Market listing is a separate maintainer-reviewed submission, not guaranteed by publishing a release.
 
 ## License
 

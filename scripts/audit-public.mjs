@@ -23,11 +23,11 @@ async function visit(dir){let count=0;for(const ent of await readdir(dir,{withFi
 }return count;}
 export async function auditTree(){
   const manifest=JSON.parse(await readFile(join(root,'package.json'),'utf8'));
-  assert.equal(manifest.version,'0.2.1');assert.ok(manifest.dsh.bundle.patch);
+  assert.equal(manifest.version,'0.2.2');assert.ok(manifest.dsh.bundle.patch);
   assert.equal(manifest.repository.url,'git+https://github.com/Zoanthamine/dsh-molecular-viewer.git');
   for(const key of ['preinstall','install','postinstall','prepare'])assert.equal(manifest.scripts?.[key],undefined,'no installation lifecycle hooks');
   assert.ok(!manifest.files.includes('docs/'),'only explicit curated documents are packaged');
-  const pins={'public/app.js':'37e140a345122ecf3b03a23b7c6a6d7e289a76c54e1bdd3885e5d43ae7f40615','public/parsers.js':'58ab0fd01b9dd4ace6b016631867ec3b0c6e1bdc0dc40f70a1ad09b6aaac35ef','public/styles.css':'e3724bf96a1398135023e356bcf59c28d09b16231ca3d1425e33bd9dfdbaa63c','public/vendor/3Dmol-min.js':'bcf422137a34b4e206413a8a83a67c24a1ace84e282bf3b164f6bda6aeb42a20'};
+  const pins={'public/app.js':'37e140a345122ecf3b03a23b7c6a6d7e289a76c54e1bdd3885e5d43ae7f40615','public/parsers.js':'3acc07bd6f761426a1a7270a9db0fdcf1bad20c38bd5b7340118ba9306b07213','public/styles.css':'e3724bf96a1398135023e356bcf59c28d09b16231ca3d1425e33bd9dfdbaa63c','public/vendor/3Dmol-min.js':'bcf422137a34b4e206413a8a83a67c24a1ace84e282bf3b164f6bda6aeb42a20'};
   for(const [path,hash] of Object.entries(pins))assert.equal(createHash('sha256').update(await readFile(join(root,path))).digest('hex'),hash,'validated runtime changed: '+path);
   return {files:await visit(root),runtimePins:Object.keys(pins).length};
 }

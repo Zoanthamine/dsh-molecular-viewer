@@ -1,4 +1,4 @@
-# 分子三维查看器 · 0.2.1
+# 分子三维查看器 · 0.2.2
 
 ## 两个入口
 
@@ -41,12 +41,12 @@
 下载 GitHub Release 中的预构建 TGZ，无需安装期构建脚本：
 
 ```bash
-dsh plugin add https://github.com/Zoanthamine/dsh-molecular-viewer/releases/download/v0.2.1/dsh-molecular-viewer-0.2.1.tgz
+dsh plugin add https://github.com/Zoanthamine/dsh-molecular-viewer/releases/download/v0.2.2/dsh-molecular-viewer-0.2.2.tgz
 ```
 
 需要 DSH 0.2.2-rc.2+、dsh-better-sidebar 0.32.1 API 和 Node 22+。安装后刷新原 DSH 页面，打开侧栏「+ → 分子三维」。登录由用户正常完成；插件不绕过宿主认证。禁用/移除此 bundle 可回退；離线 ZIP 解压后双击 index.html。
 
-公开仓库只包含插件代码、许可证及合成测试，不包含真实计算文件、个人路径或科研目录历史。0.2.1 是公开分发整理版本，查看与提取核心与已验证的 0.2.0 相同。
+公开仓库只包含插件代码、许可证及合成测试，不包含真实计算文件、个人路径或科研目录历史。0.2.2 修复 Chem3D 风格 PDB 中无 altloc、却重复使用原子名称时的误去重：保留不同原子序号及明确 CONECT 连线；真正的替代位置仍只在对应原子位点选择。公开回归测试全部使用合成数据。
 
 
 ## Agent 联动
